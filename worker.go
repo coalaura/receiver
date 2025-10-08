@@ -1,6 +1,9 @@
 package main
 
+import "sync"
+
 type Worker struct {
+	wg   sync.WaitGroup
 	jobs chan func()
 }
 
@@ -10,6 +13,8 @@ func NewWorker(routines int) *Worker {
 	}
 
 	for range routines {
+		wk.wg.Add(1)
+
 		go wk.Work()
 	}
 
@@ -21,9 +26,15 @@ func (w *Worker) Schedule(fn func()) {
 }
 
 func (w *Worker) Work() {
-	for {
-		fn := <-w.jobs
+	defer w.wg.Done()
 
+	for fn := range w.jobs {
 		fn()
 	}
+}
+
+func (w *Worker) Stop() {
+	close(w.jobs)
+
+	w.wg.Wait()
 }

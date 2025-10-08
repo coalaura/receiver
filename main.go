@@ -18,6 +18,8 @@ var (
 )
 
 func main() {
+	defer worker.Stop()
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Recoverer)

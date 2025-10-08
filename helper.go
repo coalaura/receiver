@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"net/http"
-	"os"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -19,12 +21,28 @@ func CleanName(r *http.Request) (string, bool) {
 	return name, true
 }
 
-func EnsureDirectory(path string) {
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return
+func ParseAspectRatio(r *http.Request) (float64, error) {
+	raw := chi.URLParam(r, "ratio")
+	if raw == "" {
+		return 0, nil
 	}
 
-	os.MkdirAll(path, 0755)
+	index := strings.Index(raw, ":")
+	if index == -1 {
+		return 0, errors.New("invalid aspect ratio")
+	}
+
+	width, err := strconv.ParseInt(raw[:index], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	height, err := strconv.ParseInt(raw[index+1:], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(width) / float64(height), nil
 }
 
 func Respond(w http.ResponseWriter, code int, msg string) {

@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	log = plain.New(plain.WithDate(plain.RFC3339Local))
+	log    = plain.New(plain.WithDate(plain.RFC3339Local))
+	worker = NewWorker(8)
 
 	//go:embed README.md
 	readme string

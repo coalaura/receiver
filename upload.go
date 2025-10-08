@@ -38,7 +38,7 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func() {
+	worker.Schedule(func() {
 		log.Printf("Uploading %q\n", name)
 
 		file, err := os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
@@ -58,7 +58,7 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Finished uploading %q\n", name)
-	}()
+	})
 
 	Respond(w, http.StatusOK, "OK")
 }
@@ -108,7 +108,7 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func() {
+	worker.Schedule(func() {
 		log.Printf("Uploading %q\n", name)
 
 		img, _, err := image.Decode(buf)
@@ -160,7 +160,7 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Finished uploading %q\n", name)
-	}()
+	})
 
 	Respond(w, http.StatusOK, "OK")
 }

@@ -85,7 +85,7 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if size != 0 {
+		if num != 0 {
 			size = min(max(uint(num), 128), 4096)
 		}
 	}
@@ -125,11 +125,15 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 		name += ".webp"
 
 		if ratio > 0 {
+			log.Printf("Cropping %q to ratio %.2f\n", name, ratio)
+
 			img = CropToRatio(img, ratio)
 		}
 
 		if size > 0 {
-			img = resize.Thumbnail(size, size, img, resize.Lanczos2)
+			log.Printf("Resizing %q to max %d\n", name, size)
+
+			img = resize.Thumbnail(size, size, img, resize.Lanczos3)
 		}
 
 		file, err := os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)

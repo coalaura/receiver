@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -41,7 +42,9 @@ func HandleFileUpload(w http.ResponseWriter, r *http.Request) {
 	worker.Schedule(func() {
 		log.Printf("Uploading %q\n", name)
 
-		file, err := os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		path := filepath.Join(target, name)
+
+		file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Warnf("Failed to open target file: %v\n", err)
 
@@ -136,7 +139,9 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 			img = resize.Thumbnail(size, size, img, resize.Lanczos3)
 		}
 
-		file, err := os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		path := filepath.Join(target, name)
+
+		file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Warnf("Failed to open target file: %v\n", err)
 

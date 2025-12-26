@@ -3,6 +3,8 @@ package main
 import (
 	_ "embed"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/coalaura/plain"
 	"github.com/go-chi/chi/v5"
@@ -15,10 +17,29 @@ var (
 
 	//go:embed README.md
 	readme string
+
+	target string
 )
 
 func main() {
 	defer worker.Stop()
+
+	if len(os.Args) > 1 {
+		target = filepath.Join(os.Args[1:]...)
+	} else {
+		target = "."
+	}
+
+	abs, err := filepath.Abs(target)
+	log.MustFail(err)
+
+	if _, err := os.Stat(abs); os.IsNotExist(err) {
+		os.MkdirAll(abs, 0755)
+	}
+
+	target = abs
+
+	log.Printf("Receiving to %s\n", target)
 
 	r := chi.NewRouter()
 

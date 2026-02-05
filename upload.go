@@ -15,7 +15,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
-	"github.com/gen2brain/webp"
+	"github.com/coalaura/webp"
 	"github.com/go-chi/chi/v5"
 	"github.com/nfnt/resize"
 )
@@ -152,9 +152,10 @@ func HandleImageUpload(w http.ResponseWriter, r *http.Request) {
 
 		defer file.Close()
 
-		err = webp.Encode(file, img, webp.Options{
-			Quality: 90,
-			Method:  6,
+		err = webp.Encode(file, img, &webp.Options{
+			Quality:    90,
+			Method:     6,
+			AutoFilter: true,
 		})
 		if err != nil {
 			log.Warnf("Failed to encode webp: %v\n", err)
